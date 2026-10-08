@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#087f5b">
+<title>Control de Ventas</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7f6;color:#17201d;font-family:Arial,sans-serif}
+header{background:#087f5b;color:white;padding:18px 16px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:22px}
+main{max-width:700px;margin:auto;padding:14px 14px 80px}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+nav button{border:0;padding:12px 5px;border-radius:10px;background:#dce9e5;color:#07553e;font-weight:bold}
+nav button.active{background:#087f5b;color:white}
+.card{background:white;border-radius:15px;padding:15px;margin-bottom:13px;box-shadow:0 2px 8px #0001}
+h2{font-size:18px;margin:0 0 13px}
+label{font-size:13px;font-weight:bold;display:block;margin-bottom:5px}
+input,select{width:100%;padding:11px;border:1px solid #ccd7d3;border-radius:9px;font-size:16px;background:white}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+button{border:0;border-radius:10px;padding:11px 13px;background:#087f5b;color:white;font-weight:bold;font-size:14px}
+button.secondary{background:#e3ece9;color:#07553e}
+button.red{background:#dc2626}
+button.orange{background:#d97706}
+.full{width:100%;margin-top:8px}
+.client{border:1px solid #dfe7e4;border-radius:12px;padding:12px;margin:9px 0}
+.client-name{font-weight:bold;font-size:16px}
+.client-info{font-size:12px;color:#71807b;margin-top:3px}
+.client-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.sale{display:grid;grid-template-columns:1fr 105px;gap:7px;margin-top:10px}
+.badge{font-size:11px;background:#e5f5ef;color:#087f5b;border-radius:20px;padding:4px 7px}
+.cancel{background:#fee2e2;color:#991b1b}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.box{background:#edf6f3;border-radius:11px;padding:11px}
+.box b{display:block;font-size:18px;margin-top:4px}
+.final{grid-column:1/-1;background:#087f5b;color:white}
+.empty{text-align:center;color:#77837f;padding:25px}
+.hidden{display:none}
+.history{border:1px solid #dfe7e4;border-radius:11px;padding:12px;margin-bottom:9px}
+.modal{position:fixed;inset:0;background:#0008;z-index:20;display:flex;align-items:flex-end}
+.modalbox{background:white;width:100%;padding:18px;border-radius:18px 18px 0 0}
+.modalbuttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+@media(min-width:600px){.modal{align-items:center}.modalbox{max-width:600px;margin:auto;border-radius:18px}}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Control de Ventas</h1>
+<div style="font-size:12px;opacity:.85">Datos guardados en este teléfono</div>
+</header>
+
+<main>
+
+<nav>
+<button id="nvVentas" class="active" onclick="pantalla('ventas')">Ventas</button>
+<button id="nvClientes" onclick="pantalla('clientes')">Clientes</button>
+<button id="nvHistorial" onclick="pantalla('historial')">Historial</button>
+</nav>
+
+<section id="ventas">
+
+<div class="card">
+<h2>Registrar ventas</h2>
+
+<div class="grid">
+<div>
+<label>Vendedor</label>
+<select id="vendedor" onchange="mostrarVentas()">
+<option value="1">Vendedor 1</option>
+<option value="2">Vendedor 2</option>
+</select>
+</div>
+
+<div>
+<label>Fecha</label>
+<input id="fecha" type="date" onchange="mostrarVentas()">
+</div>
+</div>
+
+<div style="margin-top:10px">
+<label>Día de visita</label>
+<select id="dia" onchange="mostrarVentas()">
+<option>lunes</option>
+<option>martes</option>
+<option>miércoles</option>
+<option>jueves</option>
+<option>viernes</option>
+<option>sábado</option>
+<option>domingo</option>
+</select>
+</div>
+</div>
+
+<div id="listaVentas"></div>
+<div id="resumen"></div>
+
+</section>
+
+<section id="clientes" class="hidden">
+
+<div class="card">
+<button class="full" onclick="nuevoCliente()">+ Agregar cliente</button>
+</div>
+
+<div id="listaClientes"></div>
+
+</section>
+
+<section id="historial" class="hidden">
+
+<div class="card">
+<h2>Días cerrados</h2>
+<div id="listaHistorial"></div>
+</div>
+
+</section>
+
+</main>
+
+<div id="modal" class="modal hidden">
+<div class="modalbox">
+
+<h2 id="tituloModal">Nuevo cliente</h2>
+
+<input id="clienteId" type="hidden">
+
+<label>Nombre</label>
+<input id="nombre" placeholder="Nombre del cliente">
+
+<div style="margin-top:10px">
+<label>Teléfono</label>
+<input id="telefono" placeholder="Opcional" type="tel">
+</div>
+
+<div class="grid" style="margin-top:10px">
+
+<div>
+<label>Vendedor</label>
+<select id="clienteVendedor">
+<option value="1">Vendedor 1</option>
+<option value="2">Vendedor 2</option>
+</select>
+</div>
+
+<div>
+<label>Día</label>
+<select id="clienteDia">
+<option>lunes</option>
+<option>martes</option>
+<option>miércoles</option>
+<option>jueves</option>
+<option>viernes</option>
+<option>sábado</option>
+<option>domingo</option>
+</select>
+</div>
+
+</div>
+
+<div class="modalbuttons">
+<button class="secondary" onclick="cerrarModal()">Cancelar</button>
+<button onclick="guardarCliente()">
